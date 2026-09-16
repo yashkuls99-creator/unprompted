@@ -137,50 +137,88 @@
   .icon-btn:hover { transform: translateY(-1px); background: var(--surface-2); }
   .icon-btn.muted { color: var(--text-faint); }
 
-  /* ---------- Setup row (off-camera area) ---------- */
-  .setup-row {
-    max-width: 960px;
-    margin: 14px auto 0;
-    width: 100%;
-    padding: 0 24px;
-  }
+  /* ---------- Pre-set topic popover (off-camera setup) ---------- */
+  .preset-wrap { position: relative; }
 
-  .setup-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  .preset-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: none;
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+  .preset-dot.show { display: block; }
+
+  .preset-popover {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: min(360px, 88vw);
     background: var(--surface);
     border: 1px dashed var(--border);
-    border-radius: 12px;
-    padding: 10px 16px;
-    opacity: 0.75;
-    transition: opacity 0.2s ease;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    z-index: 45;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
   }
-  .setup-card:focus-within { opacity: 1; }
+  .preset-popover.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 
-  .setup-card label {
-    font-size: 0.75rem;
+  .preset-popover label {
+    display: block;
+    font-size: 0.7rem;
     color: var(--text-faint);
-    white-space: nowrap;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    margin-bottom: 8px;
   }
 
-  .setup-card input[type="text"] {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
+  .preset-popover input[type="text"] {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
     color: var(--text);
     font-size: 0.92rem;
-    min-width: 120px;
+    outline: none;
   }
-  .setup-card input[type="text"]::placeholder { color: var(--text-faint); }
+  .preset-popover input[type="text"]::placeholder { color: var(--text-faint); }
 
-  .setup-card .hint {
-    font-size: 0.68rem;
+  .preset-popover-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .preset-popover .hint {
+    font-size: 0.65rem;
     color: var(--text-faint);
+  }
+
+  .preset-hide-btn {
+    border: none;
+    background: var(--teal-dim);
+    color: #06231f;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
     white-space: nowrap;
   }
 
@@ -571,19 +609,24 @@
   </div>
 
   <div class="header-icons">
+    <div class="preset-wrap">
+      <button class="icon-btn" id="presetToggleBtn" title="Pre-set topic (off-camera setup)">
+        ✏️<span class="preset-dot" id="presetDot"></span>
+      </button>
+      <div class="preset-popover" id="presetPopover">
+        <label for="presetInput">Pre-set topic (optional)</label>
+        <input type="text" id="presetInput" placeholder="Type off-camera, then hide this box…" autocomplete="off">
+        <div class="preset-popover-footer">
+          <span class="hint">Enter hides this box · clears after each spin</span>
+          <button class="preset-hide-btn" id="presetHideBtn">✓ Hide</button>
+        </div>
+      </div>
+    </div>
     <button class="icon-btn" id="themeBtn" title="Toggle light / dark">🌙</button>
     <button class="icon-btn" id="muteBtn" title="Toggle sound">🔊</button>
     <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
   </div>
 </header>
-
-<div class="setup-row">
-  <div class="setup-card">
-    <label for="presetInput">Pre-set topic (optional)</label>
-    <input type="text" id="presetInput" placeholder="Type here off-camera to force a specific spin result…" autocomplete="off">
-    <span class="hint">clears after each spin</span>
-  </div>
-</div>
 
 <main>
   <div class="stage-card">
@@ -821,6 +864,10 @@
   /* ============================= DOM ============================= */
   const $ = id => document.getElementById(id);
   const presetInput = $('presetInput');
+  const presetToggleBtn = $('presetToggleBtn');
+  const presetPopover = $('presetPopover');
+  const presetHideBtn = $('presetHideBtn');
+  const presetDot = $('presetDot');
   const spinBtn = $('spinBtn');
   const newTopicBtn = $('newTopicBtn');
   const reelText = $('reelText');
@@ -1157,30 +1204,36 @@
     stopInterval();
     timerInterval = setInterval(tickDown, 1000);
     timerRunning = true;
+    updatePhaseUI();
     updateControlsUI();
   }
 
   function pauseTimerInterval() {
     stopInterval();
     timerRunning = false;
+    updatePhaseUI();
     updateControlsUI();
   }
 
-  function startPhaseTimer(totalSeconds, phaseName) {
+  function startPhaseTimer(totalSeconds, phaseName, autoStart) {
     phase = phaseName;
     timerTotal = totalSeconds;
     timerRemaining = totalSeconds;
+    timerRunning = false;
+    stopInterval();
     timerCard.classList.remove('hidden');
     updatePhaseUI();
     renderTimer();
-    startTimerInterval();
+    updateControlsUI();
+    if (autoStart !== false) startTimerInterval();
   }
 
   function startRoundPhase() {
+    // Timer is armed but waits for the presenter to press Start.
     if (mode === 'quick') {
-      startPhaseTimer(settings.quickPrepSec, 'prep');
+      startPhaseTimer(settings.quickPrepSec, 'prep', false);
     } else {
-      startPhaseTimer(settings.researchMin * 60, 'research');
+      startPhaseTimer(settings.researchMin * 60, 'research', false);
     }
   }
 
@@ -1196,14 +1249,23 @@
   }
 
   function updatePhaseUI() {
-    const labels = {
-      research: ['Researching…', ''],
-      prep: ['Prepping…', ''],
-      ready: ['Ready when you are', 'ready'],
-      speaking: ['Speaking now', 'speaking'],
-      ended: ["Time's up!", 'ended'],
-    };
-    const [text, cls] = labels[phase] || ['', ''];
+    let text = '', cls = '';
+    const notYetStarted = !timerRunning && timerRemaining === timerTotal;
+    if (phase === 'research') {
+      text = notYetStarted ? 'Press Start to begin researching' : 'Researching…';
+    } else if (phase === 'prep') {
+      text = notYetStarted ? 'Press Start to begin prepping' : 'Prepping…';
+    } else if (phase === 'ready') {
+      text = 'Ready when you are'; cls = 'ready';
+    } else if (phase === 'speaking') {
+      text = 'Speaking now'; cls = 'speaking';
+    } else if (phase === 'ended') {
+      text = "Time's up!"; cls = 'ended';
+    } else if (phase === 'spinning') {
+      text = 'Spinning…';
+    } else {
+      text = 'Spin to begin';
+    }
     setPhaseLabelText(text, cls);
   }
 
@@ -1236,6 +1298,7 @@
       timerRunning = false;
       timerRemaining = timerTotal;
       renderTimer();
+      updatePhaseUI();
       updateControlsUI();
     }
   }
@@ -1282,6 +1345,37 @@
     tabQuick.classList.toggle('active', mode === 'quick');
   }
 
+  /* ============================= PRE-SET TOPIC POPOVER ============================= */
+  function openPresetPopover() {
+    presetPopover.classList.add('open');
+    presetInput.focus();
+  }
+  function closePresetPopover() {
+    presetPopover.classList.remove('open');
+  }
+  function updatePresetDot() {
+    presetDot.classList.toggle('show', presetInput.value.trim() !== '');
+  }
+
+  presetToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (presetPopover.classList.contains('open')) closePresetPopover();
+    else openPresetPopover();
+  });
+  presetHideBtn.addEventListener('click', closePresetPopover);
+  presetInput.addEventListener('input', updatePresetDot);
+  presetInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      closePresetPopover();
+    }
+  });
+  presetPopover.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => closePresetPopover());
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePresetPopover();
+  });
+
   /* ============================= EVENTS ============================= */
   spinBtn.addEventListener('click', () => {
     if (phase === 'spinning') return;
@@ -1297,6 +1391,8 @@
       target = drawFromPool();
     }
     presetInput.value = '';
+    updatePresetDot();
+    closePresetPopover();
     runSpinAnimation(target);
   });
 
