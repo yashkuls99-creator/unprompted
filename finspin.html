@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinSpin — Indian Finance Topic Randomizer</title>
+<style>
+  :root {
+    --navy: #0b1f3a;
+    --navy-deep: #071427;
+    --teal: #16b8a6;
+    --teal-dim: #0e8a7d;
+    --gold: #e7b93d;
+    --danger: #e2574c;
+
+    --bg: #071427;
+    --bg-grad-2: #0b1f3a;
+    --surface: #0f2847;
+    --surface-2: #123156;
+    --border: rgba(231, 185, 61, 0.16);
+    --text: #eef2f7;
+    --text-dim: #9db0c9;
+    --text-faint: #6c7f9a;
+    --accent: var(--teal);
+    --accent-2: var(--gold);
+  }
+
+  html[data-theme="light"] {
+    --bg: #f6f4ee;
+    --bg-grad-2: #eae5d8;
+    --surface: #ffffff;
+    --surface-2: #f1efe6;
+    --border: rgba(11, 31, 58, 0.12);
+    --text: #0b1f3a;
+    --text-dim: #445573;
+    --text-faint: #7c8aa3;
+    --accent: var(--teal-dim);
+    --accent-2: #b8860b;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(circle at 20% 0%, var(--bg-grad-2), var(--bg) 60%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .brand .logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .brand .logo span { color: var(--accent-2); }
+
+  .brand .tagline {
+    font-size: 0.78rem;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+
+  .mode-tabs {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .mode-tab {
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 8px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mode-tab.active {
+    background: linear-gradient(135deg, var(--teal), var(--teal-dim));
+    color: #06231f;
+  }
+
+  .mode-tab:disabled { cursor: not-allowed; opacity: 0.6; }
+
+  .header-icons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .icon-btn:hover { transform: translateY(-1px); background: var(--surface-2); }
+  .icon-btn.muted { color: var(--text-faint); }
+
+  /* ---------- Setup row (off-camera area) ---------- */
+  .setup-row {
+    max-width: 960px;
+    margin: 14px auto 0;
+    width: 100%;
+    padding: 0 24px;
+  }
+
+  .setup-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 10px 16px;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+  }
+  .setup-card:focus-within { opacity: 1; }
+
+  .setup-card label {
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    white-space: nowrap;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .setup-card input[type="text"] {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 0.92rem;
+    min-width: 120px;
+  }
+  .setup-card input[type="text"]::placeholder { color: var(--text-faint); }
+
+  .setup-card .hint {
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  /* ---------- Main stage ---------- */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 28px 20px 40px;
+    gap: 28px;
+  }
+
+  .stage-card {
+    width: 100%;
+    max-width: 900px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 36px 32px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+
+  .reel-viewport {
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+  }
+
+  .reel-text {
+    font-size: clamp(1.6rem, 4.2vw, 2.9rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    transition: filter 0.08s linear;
+  }
+
+  .reel-text.placeholder {
+    color: var(--text-faint);
+    font-weight: 600;
+    font-size: clamp(1.2rem, 3vw, 1.7rem);
+  }
+
+  .reel-text.pop {
+    animation: pop 0.35s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.9); }
+    55% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  .meta-row {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 30px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-dim);
+  }
+
+  .badge.difficulty-easy { color: #3fcf7f; border-color: rgba(63,207,127,0.4); }
+  .badge.difficulty-medium { color: var(--gold); border-color: rgba(231,185,61,0.4); }
+  .badge.difficulty-hard { color: var(--danger); border-color: rgba(226,87,76,0.4); }
+
+  .spin-btn {
+    margin-top: 26px;
+    border: none;
+    border-radius: 16px;
+    padding: 18px 48px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #06231f;
+    background: linear-gradient(135deg, var(--gold), var(--teal));
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(231,185,61,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  }
+  .spin-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(231,185,61,0.32); }
+  .spin-btn:active:not(:disabled) { transform: translateY(0); }
+  .spin-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+  .new-topic-btn {
+    margin-top: 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .new-topic-btn:hover { background: var(--surface-2); color: var(--text); }
+  .new-topic-btn.hidden, .spin-btn.hidden { display: none; }
+
+  /* ---------- Timer panel ---------- */
+  .timer-card {
+    width: 100%;
+    max-width: 900px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 30px 32px;
+    text-align: center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .timer-card.hidden { display: none; }
+
+  .phase-label {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .phase-label.ready { color: var(--gold); }
+  .phase-label.speaking { color: var(--teal); }
+  .phase-label.ended { color: var(--danger); }
+
+  .timer-display {
+    font-size: clamp(3.5rem, 12vw, 6.5rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    color: var(--text);
+    transition: color 0.25s ease;
+  }
+
+  .timer-display.warning { color: var(--gold); }
+  .timer-display.zero { color: var(--danger); animation: pulse 1s ease infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+
+  .progress-track {
+    margin: 18px auto 0;
+    max-width: 560px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    transition: width 1s linear, background 0.3s ease;
+  }
+  .progress-fill.zero { background: var(--danger); }
+
+  .timer-controls {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .ctrl-btn {
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 110px;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+  .ctrl-btn:hover:not(:disabled) { transform: translateY(-1px); background: var(--surface); }
+  .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .ctrl-btn.primary {
+    background: linear-gradient(135deg, var(--gold), var(--teal));
+    color: #06231f;
+    border: none;
+  }
+  .ctrl-btn.danger-outline { border-color: rgba(226,87,76,0.4); color: var(--danger); }
+
+  /* ---------- Settings panel ---------- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 10, 22, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 40;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .settings-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(400px, 92vw);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    z-index: 50;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+    padding: 24px;
+  }
+  .settings-panel.open { transform: translateX(0); }
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .settings-header h2 { font-size: 1.2rem; margin: 0; }
+  .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .settings-section {
+    margin-bottom: 26px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-section:last-child { border-bottom: none; }
+
+  .settings-section h3 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    margin: 0 0 12px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .slider-row .slider-label { font-size: 0.9rem; font-weight: 600; }
+  .slider-row .slider-value {
+    font-weight: 800;
+    color: var(--accent-2);
+    font-variant-numeric: tabular-nums;
+    min-width: 62px;
+    text-align: right;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--teal);
+    height: 28px;
+    cursor: pointer;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .toggle-row .slider-label { font-size: 0.9rem; font-weight: 600; }
+
+  .switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .track {
+    position: absolute;
+    inset: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: background 0.2s ease;
+  }
+  .switch .thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: var(--text-faint);
+    border-radius: 50%;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .switch input:checked + .track { background: var(--teal-dim); }
+  .switch input:checked + .track .thumb { transform: translateX(22px); background: #06231f; }
+
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .category-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .category-item input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--teal);
+    cursor: pointer;
+  }
+
+  .theme-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .theme-buttons button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-dim);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .theme-buttons button.active {
+    background: linear-gradient(135deg, var(--gold), var(--teal));
+    color: #06231f;
+    border: none;
+  }
+
+  footer {
+    text-align: center;
+    padding: 10px 20px 20px;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+  }
+
+  @media (max-width: 640px) {
+    .stage-card, .timer-card { padding: 24px 18px; }
+    header { padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">Fin<span>Spin</span></div>
+    <div class="tagline">Indian finance topic randomizer</div>
+  </div>
+
+  <div class="mode-tabs" id="modeTabs">
+    <button class="mode-tab active" data-mode="deep" id="tabDeep">Deep Dive</button>
+    <button class="mode-tab" data-mode="quick" id="tabQuick">Quick Take</button>
+  </div>
+
+  <div class="header-icons">
+    <button class="icon-btn" id="themeBtn" title="Toggle light / dark">🌙</button>
+    <button class="icon-btn" id="muteBtn" title="Toggle sound">🔊</button>
+    <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
+  </div>
+</header>
+
+<div class="setup-row">
+  <div class="setup-card">
+    <label for="presetInput">Pre-set topic (optional)</label>
+    <input type="text" id="presetInput" placeholder="Type here off-camera to force a specific spin result…" autocomplete="off">
+    <span class="hint">clears after each spin</span>
+  </div>
+</div>
+
+<main>
+  <div class="stage-card">
+    <div class="reel-viewport">
+      <div class="reel-text placeholder" id="reelText">Press Spin to draw a topic</div>
+    </div>
+    <div class="meta-row" id="metaRow"></div>
+
+    <button class="spin-btn" id="spinBtn">🎯 Spin</button>
+    <button class="new-topic-btn hidden" id="newTopicBtn">↻ New Topic</button>
+  </div>
+
+  <div class="timer-card hidden" id="timerCard">
+    <div class="phase-label" id="phaseLabel">Spin to begin</div>
+    <div class="timer-display" id="timerDisplay">00:00</div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="timer-controls">
+      <button class="ctrl-btn primary" id="startPauseBtn">Start</button>
+      <button class="ctrl-btn" id="resetBtn">Reset</button>
+      <button class="ctrl-btn" id="skipBtn">Skip to Ready</button>
+      <button class="ctrl-btn primary" id="beginSpeakingBtn" style="display:none;">🎤 Begin Speaking</button>
+      <button class="ctrl-btn danger-outline" id="abandonBtn">New Topic</button>
+    </div>
+  </div>
+</main>
+
+<footer>FinSpin · runs entirely offline in your browser · no data leaves this device</footer>
+
+<div class="overlay" id="overlay"></div>
+<aside class="settings-panel" id="settingsPanel">
+  <div class="settings-header">
+    <h2>Settings</h2>
+    <button class="close-btn" id="closeSettingsBtn">✕</button>
+  </div>
+
+  <div class="settings-section">
+    <h3>Timers</h3>
+    <div class="slider-row">
+      <span class="slider-label">Research timer</span>
+      <span class="slider-value" id="researchValue">10 min</span>
+    </div>
+    <input type="range" id="researchRange" min="1" max="60" step="1" value="10">
+
+    <div class="slider-row" style="margin-top:18px;">
+      <span class="slider-label">Speaking timer</span>
+      <span class="slider-value" id="speakingValue">2 min</span>
+    </div>
+    <input type="range" id="speakingRange" min="1" max="15" step="1" value="2">
+
+    <div class="slider-row" style="margin-top:18px;">
+      <span class="slider-label">Quick Take prep timer</span>
+      <span class="slider-value" id="quickPrepValue">30 sec</span>
+    </div>
+    <input type="range" id="quickPrepRange" min="15" max="300" step="5" value="30">
+  </div>
+
+  <div class="settings-section">
+    <h3>Sound</h3>
+    <div class="toggle-row">
+      <span class="slider-label">Sound effects</span>
+      <label class="switch">
+        <input type="checkbox" id="soundToggle" checked>
+        <span class="track"><span class="thumb"></span></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3>Appearance</h3>
+    <div class="theme-buttons">
+      <button id="darkBtn" class="active">🌙 Dark</button>
+      <button id="lightBtn">☀️ Light</button>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h3>Categories included in random spins</h3>
+    <div class="category-list" id="categoryList"></div>
+  </div>
+</aside>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================= TOPIC BANK ============================= */
+  const TOPICS = [
+    // Mutual Funds & Investing
+    { topic: "SIP vs lumpsum", category: "Mutual Funds & Investing", difficulty: "easy" },
+    { topic: "Expense ratio explained", category: "Mutual Funds & Investing", difficulty: "easy" },
+    { topic: "Direct vs regular mutual fund plans", category: "Mutual Funds & Investing", difficulty: "easy" },
+    { topic: "NAV vs market price of an ETF", category: "Mutual Funds & Investing", difficulty: "medium" },
+    { topic: "Alpha and beta explained", category: "Mutual Funds & Investing", difficulty: "hard" },
+    { topic: "What is an exit load", category: "Mutual Funds & Investing", difficulty: "easy" },
+    { topic: "Index funds vs actively managed funds", category: "Mutual Funds & Investing", difficulty: "medium" },
+    { topic: "What is a fund's AUM", category: "Mutual Funds & Investing", difficulty: "easy" },
+    { topic: "Sharpe ratio explained", category: "Mutual Funds & Investing", difficulty: "hard" },
+    { topic: "Growth vs IDCW (dividend) option", category: "Mutual Funds & Investing", difficulty: "medium" },
+    { topic: "What is portfolio rebalancing", category: "Mutual Funds & Investing", difficulty: "medium" },
+    { topic: "Sectoral vs thematic mutual funds", category: "Mutual Funds & Investing", difficulty: "medium" },
+    { topic: "Fund of funds explained", category: "Mutual Funds & Investing", difficulty: "medium" },
+    { topic: "Tracking error in index funds", category: "Mutual Funds & Investing", difficulty: "hard" },
+    { topic: "Systematic Withdrawal Plan (SWP)", category: "Mutual Funds & Investing", difficulty: "easy" },
+
+    // Stock Market & Trading
+    { topic: "What is a P/E ratio", category: "Stock Market & Trading", difficulty: "easy" },
+    { topic: "Circuit breakers explained", category: "Stock Market & Trading", difficulty: "medium" },
+    { topic: "F&O basics", category: "Stock Market & Trading", difficulty: "medium" },
+    { topic: "Bonus shares vs stock split", category: "Stock Market & Trading", difficulty: "easy" },
+    { topic: "Short selling in India", category: "Stock Market & Trading", difficulty: "hard" },
+    { topic: "What is a demat account", category: "Stock Market & Trading", difficulty: "easy" },
+    { topic: "Bull market vs bear market", category: "Stock Market & Trading", difficulty: "easy" },
+    { topic: "What is market capitalization", category: "Stock Market & Trading", difficulty: "easy" },
+    { topic: "Dividend yield explained", category: "Stock Market & Trading", difficulty: "medium" },
+    { topic: "Call options vs put options", category: "Stock Market & Trading", difficulty: "hard" },
+    { topic: "What is open interest", category: "Stock Market & Trading", difficulty: "hard" },
+    { topic: "Book value vs market value", category: "Stock Market & Trading", difficulty: "medium" },
+    { topic: "What is a rights issue", category: "Stock Market & Trading", difficulty: "medium" },
+    { topic: "Algorithmic trading basics", category: "Stock Market & Trading", difficulty: "hard" },
+    { topic: "What is India VIX", category: "Stock Market & Trading", difficulty: "medium" },
+
+    // Personal Income Tax
+    { topic: "Old vs new tax regime", category: "Personal Income Tax", difficulty: "easy" },
+    { topic: "Section 80C basics", category: "Personal Income Tax", difficulty: "easy" },
+    { topic: "What is Form 26AS", category: "Personal Income Tax", difficulty: "medium" },
+    { topic: "Capital gains tax on property", category: "Personal Income Tax", difficulty: "hard" },
+    { topic: "Set-off and carry forward of losses", category: "Personal Income Tax", difficulty: "hard" },
+    { topic: "What is TDS", category: "Personal Income Tax", difficulty: "easy" },
+    { topic: "HRA exemption explained", category: "Personal Income Tax", difficulty: "medium" },
+    { topic: "Which ITR form should you use", category: "Personal Income Tax", difficulty: "medium" },
+    { topic: "Short-term vs long-term capital gains", category: "Personal Income Tax", difficulty: "medium" },
+    { topic: "What is Form 16", category: "Personal Income Tax", difficulty: "easy" },
+    { topic: "Advance tax basics", category: "Personal Income Tax", difficulty: "medium" },
+    { topic: "Standard deduction explained", category: "Personal Income Tax", difficulty: "easy" },
+    { topic: "Clubbing of income rules", category: "Personal Income Tax", difficulty: "hard" },
+    { topic: "What is AIS (Annual Information Statement)", category: "Personal Income Tax", difficulty: "medium" },
+
+    // GST & Business Compliance
+    { topic: "What is input tax credit", category: "GST & Business Compliance", difficulty: "medium" },
+    { topic: "Composition scheme under GST", category: "GST & Business Compliance", difficulty: "medium" },
+    { topic: "E-way bill basics", category: "GST & Business Compliance", difficulty: "easy" },
+    { topic: "Reverse charge mechanism", category: "GST & Business Compliance", difficulty: "hard" },
+    { topic: "GSTR-1 vs GSTR-3B", category: "GST & Business Compliance", difficulty: "medium" },
+    { topic: "CGST vs SGST vs IGST", category: "GST & Business Compliance", difficulty: "easy" },
+    { topic: "What is an HSN code", category: "GST & Business Compliance", difficulty: "easy" },
+    { topic: "GST registration threshold limits", category: "GST & Business Compliance", difficulty: "easy" },
+    { topic: "Debit note vs credit note in GST", category: "GST & Business Compliance", difficulty: "medium" },
+    { topic: "Zero-rated supply under GST", category: "GST & Business Compliance", difficulty: "hard" },
+    { topic: "E-invoicing under GST", category: "GST & Business Compliance", difficulty: "medium" },
+
+    // Banking & Credit
+    { topic: "CIBIL score basics", category: "Banking & Credit", difficulty: "easy" },
+    { topic: "Repo rate explained", category: "Banking & Credit", difficulty: "easy" },
+    { topic: "Fixed vs floating interest rate", category: "Banking & Credit", difficulty: "easy" },
+    { topic: "What is an NPA", category: "Banking & Credit", difficulty: "medium" },
+    { topic: "Sweep-in fixed deposits explained", category: "Banking & Credit", difficulty: "medium" },
+    { topic: "Credit card billing cycle explained", category: "Banking & Credit", difficulty: "easy" },
+    { topic: "What is credit utilization ratio", category: "Banking & Credit", difficulty: "medium" },
+    { topic: "Secured vs unsecured loans", category: "Banking & Credit", difficulty: "easy" },
+    { topic: "CRR and SLR explained", category: "Banking & Credit", difficulty: "hard" },
+    { topic: "What is a bank guarantee", category: "Banking & Credit", difficulty: "medium" },
+    { topic: "Prepayment vs foreclosure of a loan", category: "Banking & Credit", difficulty: "easy" },
+    { topic: "What is co-lending", category: "Banking & Credit", difficulty: "hard" },
+
+    // Insurance
+    { topic: "Term plan vs endowment plan", category: "Insurance", difficulty: "easy" },
+    { topic: "ULIPs explained", category: "Insurance", difficulty: "medium" },
+    { topic: "Claim settlement ratio", category: "Insurance", difficulty: "medium" },
+    { topic: "What is sum assured", category: "Insurance", difficulty: "easy" },
+    { topic: "No-claim bonus in health insurance", category: "Insurance", difficulty: "easy" },
+    { topic: "What is a rider in insurance", category: "Insurance", difficulty: "medium" },
+    { topic: "Role of IRDAI", category: "Insurance", difficulty: "medium" },
+    { topic: "What is a free-look period", category: "Insurance", difficulty: "easy" },
+    { topic: "Co-payment in health insurance", category: "Insurance", difficulty: "medium" },
+    { topic: "What is reinsurance", category: "Insurance", difficulty: "hard" },
+
+    // Retirement & Government Schemes
+    { topic: "EPF vs PPF vs NPS", category: "Retirement & Government Schemes", difficulty: "medium" },
+    { topic: "Atal Pension Yojana", category: "Retirement & Government Schemes", difficulty: "easy" },
+    { topic: "Sovereign Gold Bonds explained", category: "Retirement & Government Schemes", difficulty: "medium" },
+    { topic: "NPS Tier 1 vs Tier 2", category: "Retirement & Government Schemes", difficulty: "medium" },
+    { topic: "Senior Citizens Savings Scheme", category: "Retirement & Government Schemes", difficulty: "easy" },
+    { topic: "What is EPS (Employees' Pension Scheme)", category: "Retirement & Government Schemes", difficulty: "hard" },
+    { topic: "Sukanya Samriddhi Yojana", category: "Retirement & Government Schemes", difficulty: "easy" },
+    { topic: "What is gratuity and how it's calculated", category: "Retirement & Government Schemes", difficulty: "medium" },
+
+    // Macro & Current Finance
+    { topic: "What is inflation targeting", category: "Macro & Current Finance", difficulty: "medium" },
+    { topic: "RBI's monetary policy tools", category: "Macro & Current Finance", difficulty: "hard" },
+    { topic: "Union Budget basics", category: "Macro & Current Finance", difficulty: "easy" },
+    { topic: "What is fiscal deficit", category: "Macro & Current Finance", difficulty: "medium" },
+    { topic: "How repo rate transmission works", category: "Macro & Current Finance", difficulty: "hard" },
+    { topic: "Current account deficit vs fiscal deficit", category: "Macro & Current Finance", difficulty: "medium" },
+    { topic: "What is GDP deflator", category: "Macro & Current Finance", difficulty: "hard" },
+    { topic: "What is a yield curve", category: "Macro & Current Finance", difficulty: "hard" },
+    { topic: "What is quantitative easing", category: "Macro & Current Finance", difficulty: "hard" },
+    { topic: "CPI vs WPI explained", category: "Macro & Current Finance", difficulty: "medium" },
+
+    // Crypto & New-age Finance
+    { topic: "How crypto is taxed in India", category: "Crypto & New-age Finance", difficulty: "medium" },
+    { topic: "What is a stablecoin", category: "Crypto & New-age Finance", difficulty: "easy" },
+    { topic: "UPI vs IMPS vs NEFT vs RTGS", category: "Crypto & New-age Finance", difficulty: "easy" },
+    { topic: "What is CBDC (digital rupee)", category: "Crypto & New-age Finance", difficulty: "medium" },
+    { topic: "What is DeFi", category: "Crypto & New-age Finance", difficulty: "hard" },
+    { topic: "What is blockchain in simple terms", category: "Crypto & New-age Finance", difficulty: "easy" },
+    { topic: "What is an NFT", category: "Crypto & New-age Finance", difficulty: "easy" },
+    { topic: "TDS on crypto transactions", category: "Crypto & New-age Finance", difficulty: "medium" },
+  ];
+
+  const CATEGORIES = [...new Set(TOPICS.map(t => t.category))];
+
+  /* ============================= STATE ============================= */
+  const DEFAULT_SETTINGS = {
+    researchMin: 10,
+    speakingMin: 2,
+    quickPrepSec: 30,
+    soundOn: true,
+    theme: 'dark',
+    categories: [...CATEGORIES],
+  };
+
+  let settings = loadSettings();
+
+  let mode = 'deep'; // 'deep' | 'quick'
+  let pool = [];
+  let poolKey = '';
+  let currentTopic = null;
+  let phase = 'idle'; // idle | spinning | research | prep | ready | speaking | ended
+  let timerInterval = null;
+  let timerRemaining = 0;
+  let timerTotal = 0;
+  let timerRunning = false;
+
+  /* ============================= DOM ============================= */
+  const $ = id => document.getElementById(id);
+  const presetInput = $('presetInput');
+  const spinBtn = $('spinBtn');
+  const newTopicBtn = $('newTopicBtn');
+  const reelText = $('reelText');
+  const metaRow = $('metaRow');
+  const timerCard = $('timerCard');
+  const phaseLabel = $('phaseLabel');
+  const timerDisplay = $('timerDisplay');
+  const progressFill = $('progressFill');
+  const startPauseBtn = $('startPauseBtn');
+  const resetBtn = $('resetBtn');
+  const skipBtn = $('skipBtn');
+  const beginSpeakingBtn = $('beginSpeakingBtn');
+  const abandonBtn = $('abandonBtn');
+
+  const settingsBtn = $('settingsBtn');
+  const closeSettingsBtn = $('closeSettingsBtn');
+  const settingsPanel = $('settingsPanel');
+  const overlay = $('overlay');
+  const themeBtn = $('themeBtn');
+  const muteBtn = $('muteBtn');
+
+  const researchRange = $('researchRange');
+  const researchValue = $('researchValue');
+  const speakingRange = $('speakingRange');
+  const speakingValue = $('speakingValue');
+  const quickPrepRange = $('quickPrepRange');
+  const quickPrepValue = $('quickPrepValue');
+  const soundToggle = $('soundToggle');
+  const darkBtn = $('darkBtn');
+  const lightBtn = $('lightBtn');
+  const categoryList = $('categoryList');
+  const tabDeep = $('tabDeep');
+  const tabQuick = $('tabQuick');
+
+  /* ============================= AUDIO ============================= */
+  let audioCtx = null;
+  let masterGain = null;
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = settings.soundOn ? 0.5 : 0;
+      masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function applySoundSetting() {
+    if (masterGain) masterGain.gain.value = settings.soundOn ? 0.5 : 0;
+  }
+
+  function playTick(progress) {
+    if (!settings.soundOn || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(880 + (1 - progress) * 260 + Math.random() * 30, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.32, t + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+    osc.connect(gain);
+    gain.connect(masterGain);
+    osc.start(t);
+    osc.stop(t + 0.05);
+  }
+
+  function playLandingChime() {
+    if (!settings.soundOn || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      const start = t + i * 0.07;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.4, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.5);
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.start(start);
+      osc.stop(start + 0.55);
+    });
+  }
+
+  function playAlertChime() {
+    if (!settings.soundOn || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    [880, 880, 1174.66].forEach((f, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = f;
+      const start = t + i * 0.18;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.5, start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.16);
+      osc.connect(gain);
+      gain.connect(masterGain);
+      osc.start(start);
+      osc.stop(start + 0.18);
+    });
+  }
+
+  /* ============================= SETTINGS ============================= */
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem('finspin.settings');
+      if (!raw) return { ...DEFAULT_SETTINGS };
+      const parsed = JSON.parse(raw);
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    } catch (e) {
+      return { ...DEFAULT_SETTINGS };
+    }
+  }
+
+  function saveSettings() {
+    try {
+      localStorage.setItem('finspin.settings', JSON.stringify(settings));
+    } catch (e) { /* ignore */ }
+  }
+
+  function applyTheme() {
+    document.documentElement.setAttribute('data-theme', settings.theme);
+    themeBtn.textContent = settings.theme === 'dark' ? '🌙' : '☀️';
+    darkBtn.classList.toggle('active', settings.theme === 'dark');
+    lightBtn.classList.toggle('active', settings.theme === 'light');
+  }
+
+  function renderSettingsUI() {
+    researchRange.value = settings.researchMin;
+    researchValue.textContent = settings.researchMin + ' min';
+    speakingRange.value = settings.speakingMin;
+    speakingValue.textContent = settings.speakingMin + ' min';
+    quickPrepRange.value = settings.quickPrepSec;
+    quickPrepValue.textContent = formatSecLabel(settings.quickPrepSec);
+    soundToggle.checked = settings.soundOn;
+    muteBtn.textContent = settings.soundOn ? '🔊' : '🔇';
+    muteBtn.classList.toggle('muted', !settings.soundOn);
+    applyTheme();
+    renderCategoryList();
+  }
+
+  function formatSecLabel(sec) {
+    if (sec < 60) return sec + ' sec';
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return s === 0 ? m + ' min' : m + ' min ' + s + ' sec';
+  }
+
+  function renderCategoryList() {
+    categoryList.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+      const id = 'cat_' + cat.replace(/[^a-z0-9]/gi, '_');
+      const label = document.createElement('label');
+      label.className = 'category-item';
+      label.setAttribute('for', id);
+      const checked = settings.categories.includes(cat);
+      label.innerHTML = `<input type="checkbox" id="${id}" ${checked ? 'checked' : ''}> <span>${cat}</span>`;
+      label.querySelector('input').addEventListener('change', (e) => {
+        if (e.target.checked) {
+          if (!settings.categories.includes(cat)) settings.categories.push(cat);
+        } else {
+          settings.categories = settings.categories.filter(c => c !== cat);
+        }
+        saveSettings();
+      });
+      categoryList.appendChild(label);
+    });
+  }
+
+  /* ============================= TOPIC DRAW ============================= */
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function currentCategoryKey() {
+    return [...settings.categories].sort().join('|');
+  }
+
+  function ensurePoolFresh() {
+    const key = currentCategoryKey();
+    if (key !== poolKey) {
+      poolKey = key;
+      pool = [];
+    }
+    if (pool.length === 0) {
+      let indices = TOPICS.map((t, i) => i).filter(i => settings.categories.includes(TOPICS[i].category));
+      if (indices.length === 0) indices = TOPICS.map((t, i) => i);
+      pool = shuffle(indices);
+    }
+  }
+
+  function drawFromPool() {
+    ensurePoolFresh();
+    const idx = pool.pop();
+    const t = TOPICS[idx];
+    return { topic: t.topic, category: t.category, difficulty: t.difficulty, isPreset: false };
+  }
+
+  /* ============================= SPIN ANIMATION ============================= */
+  function buildTickSchedule(duration) {
+    const count = 42;
+    const times = [];
+    for (let i = 1; i <= count; i++) {
+      const x = i / count;
+      const eased = 1 - Math.pow(1 - x, 3);
+      times.push(eased * duration);
+    }
+    return times;
+  }
+
+  function buildCycleTexts() {
+    const texts = TOPICS.map(t => t.topic);
+    return shuffle([...texts]);
+  }
+
+  function showReelText(text) {
+    reelText.textContent = text;
+    reelText.classList.remove('placeholder');
+    reelText.classList.remove('pop');
+    void reelText.offsetWidth;
+    reelText.classList.add('pop');
+  }
+
+  function runSpinAnimation(target) {
+    phase = 'spinning';
+    currentTopic = null;
+    metaRow.innerHTML = '';
+    spinBtn.disabled = true;
+    presetInput.disabled = true;
+    newTopicBtn.classList.add('hidden');
+    timerCard.classList.add('hidden');
+    setPhaseLabelText('Spinning…', '');
+
+    const duration = 2800 + Math.random() * 700;
+    const ticks = buildTickSchedule(duration);
+    const cycleTexts = buildCycleTexts();
+    const startTime = performance.now();
+    let tickPtr = 0;
+
+    function frame(now) {
+      const elapsed = now - startTime;
+      while (tickPtr < ticks.length && elapsed >= ticks[tickPtr]) {
+        const progress = tickPtr / ticks.length;
+        const text = tickPtr === ticks.length - 1 ? target.topic : cycleTexts[tickPtr % cycleTexts.length];
+        showReelText(text);
+        reelText.style.filter = 'blur(' + Math.max(0, (1 - progress) * 3.2) + 'px)';
+        playTick(progress);
+        tickPtr++;
+      }
+      if (elapsed < duration) {
+        requestAnimationFrame(frame);
+      } else {
+        finishSpin(target);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function finishSpin(target) {
+    currentTopic = target;
+    showReelText(target.topic);
+    reelText.style.filter = 'none';
+    playLandingChime();
+    renderTopicMeta(target);
+    spinBtn.classList.add('hidden');
+    newTopicBtn.classList.remove('hidden');
+    presetInput.disabled = false;
+    startRoundPhase();
+  }
+
+  function renderTopicMeta(target) {
+    metaRow.innerHTML = '';
+    const catBadge = document.createElement('span');
+    catBadge.className = 'badge';
+    catBadge.textContent = target.category;
+    metaRow.appendChild(catBadge);
+
+    if (target.difficulty) {
+      const diffBadge = document.createElement('span');
+      diffBadge.className = 'badge difficulty-' + target.difficulty;
+      diffBadge.textContent = target.difficulty.toUpperCase();
+      metaRow.appendChild(diffBadge);
+    }
+  }
+
+  /* ============================= TIMER ENGINE ============================= */
+  function fmt(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function setPhaseLabelText(text, cls) {
+    phaseLabel.textContent = text;
+    phaseLabel.className = 'phase-label' + (cls ? ' ' + cls : '');
+  }
+
+  function renderTimer() {
+    timerDisplay.textContent = fmt(timerRemaining);
+    const pct = timerTotal > 0 ? ((timerTotal - timerRemaining) / timerTotal) * 100 : 0;
+    progressFill.style.width = pct + '%';
+    const lowThreshold = Math.min(10, Math.ceil(timerTotal * 0.1));
+    timerDisplay.classList.toggle('zero', timerRemaining === 0);
+    timerDisplay.classList.toggle('warning', timerRemaining > 0 && timerRemaining <= lowThreshold);
+    progressFill.classList.toggle('zero', timerRemaining === 0);
+  }
+
+  function stopInterval() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function tickDown() {
+    timerRemaining--;
+    if (timerRemaining <= 0) {
+      timerRemaining = 0;
+      renderTimer();
+      stopInterval();
+      timerRunning = false;
+      onPhaseTimerZero();
+      return;
+    }
+    renderTimer();
+  }
+
+  function startTimerInterval() {
+    stopInterval();
+    timerInterval = setInterval(tickDown, 1000);
+    timerRunning = true;
+    updateControlsUI();
+  }
+
+  function pauseTimerInterval() {
+    stopInterval();
+    timerRunning = false;
+    updateControlsUI();
+  }
+
+  function startPhaseTimer(totalSeconds, phaseName) {
+    phase = phaseName;
+    timerTotal = totalSeconds;
+    timerRemaining = totalSeconds;
+    timerCard.classList.remove('hidden');
+    updatePhaseUI();
+    renderTimer();
+    startTimerInterval();
+  }
+
+  function startRoundPhase() {
+    if (mode === 'quick') {
+      startPhaseTimer(settings.quickPrepSec, 'prep');
+    } else {
+      startPhaseTimer(settings.researchMin * 60, 'research');
+    }
+  }
+
+  function onPhaseTimerZero() {
+    playAlertChime();
+    if (phase === 'research' || phase === 'prep') {
+      phase = 'ready';
+    } else if (phase === 'speaking') {
+      phase = 'ended';
+    }
+    updatePhaseUI();
+    updateControlsUI();
+  }
+
+  function updatePhaseUI() {
+    const labels = {
+      research: ['Researching…', ''],
+      prep: ['Prepping…', ''],
+      ready: ['Ready when you are', 'ready'],
+      speaking: ['Speaking now', 'speaking'],
+      ended: ["Time's up!", 'ended'],
+    };
+    const [text, cls] = labels[phase] || ['', ''];
+    setPhaseLabelText(text, cls);
+  }
+
+  function updateControlsUI() {
+    const inTimerPhase = ['research', 'prep', 'speaking'].includes(phase);
+    startPauseBtn.style.display = inTimerPhase ? '' : 'none';
+    startPauseBtn.textContent = timerRunning ? 'Pause' : (timerRemaining === timerTotal ? 'Start' : 'Resume');
+    startPauseBtn.disabled = inTimerPhase && timerRemaining === 0;
+
+    resetBtn.style.display = (inTimerPhase || phase === 'ready') ? '' : 'none';
+    skipBtn.style.display = (phase === 'research' || phase === 'prep') ? '' : 'none';
+    beginSpeakingBtn.style.display = phase === 'ready' ? '' : 'none';
+    abandonBtn.style.display = phase === 'idle' ? 'none' : '';
+  }
+
+  function toggleStartPause() {
+    if (!['research', 'prep', 'speaking'].includes(phase)) return;
+    if (timerRunning) {
+      pauseTimerInterval();
+    } else if (timerRemaining > 0) {
+      startTimerInterval();
+    }
+  }
+
+  function resetCurrentPhaseTimer() {
+    if (phase === 'ready') {
+      startRoundPhase();
+    } else if (['research', 'prep', 'speaking'].includes(phase)) {
+      stopInterval();
+      timerRunning = false;
+      timerRemaining = timerTotal;
+      renderTimer();
+      updateControlsUI();
+    }
+  }
+
+  function skipToReady() {
+    if (phase !== 'research' && phase !== 'prep') return;
+    stopInterval();
+    timerRunning = false;
+    timerRemaining = 0;
+    renderTimer();
+    onPhaseTimerZero();
+  }
+
+  function beginSpeaking() {
+    if (phase !== 'ready') return;
+    startPhaseTimer(settings.speakingMin * 60, 'speaking');
+  }
+
+  function resetAll() {
+    stopInterval();
+    timerRunning = false;
+    phase = 'idle';
+    currentTopic = null;
+    timerRemaining = 0;
+    timerTotal = 0;
+    reelText.textContent = 'Press Spin to draw a topic';
+    reelText.classList.add('placeholder');
+    reelText.style.filter = 'none';
+    metaRow.innerHTML = '';
+    spinBtn.classList.remove('hidden');
+    spinBtn.disabled = false;
+    newTopicBtn.classList.add('hidden');
+    timerCard.classList.add('hidden');
+    presetInput.disabled = false;
+    updatePhaseUI();
+    updateControlsUI();
+  }
+
+  /* ============================= MODE ============================= */
+  function setMode(newMode) {
+    if (phase !== 'idle') return;
+    mode = newMode;
+    tabDeep.classList.toggle('active', mode === 'deep');
+    tabQuick.classList.toggle('active', mode === 'quick');
+  }
+
+  /* ============================= EVENTS ============================= */
+  spinBtn.addEventListener('click', () => {
+    if (phase === 'spinning') return;
+    ensureAudio();
+    const presetRaw = presetInput.value.trim();
+    let target;
+    if (presetRaw) {
+      const match = TOPICS.find(t => t.topic.toLowerCase() === presetRaw.toLowerCase());
+      target = match
+        ? { topic: match.topic, category: match.category, difficulty: match.difficulty, isPreset: true }
+        : { topic: presetRaw, category: 'Custom', difficulty: null, isPreset: true };
+    } else {
+      target = drawFromPool();
+    }
+    presetInput.value = '';
+    runSpinAnimation(target);
+  });
+
+  newTopicBtn.addEventListener('click', resetAll);
+  abandonBtn.addEventListener('click', resetAll);
+  startPauseBtn.addEventListener('click', toggleStartPause);
+  resetBtn.addEventListener('click', resetCurrentPhaseTimer);
+  skipBtn.addEventListener('click', skipToReady);
+  beginSpeakingBtn.addEventListener('click', beginSpeaking);
+
+  tabDeep.addEventListener('click', () => setMode('deep'));
+  tabQuick.addEventListener('click', () => setMode('quick'));
+
+  settingsBtn.addEventListener('click', () => {
+    settingsPanel.classList.add('open');
+    overlay.classList.add('open');
+  });
+  function closeSettings() {
+    settingsPanel.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+  closeSettingsBtn.addEventListener('click', closeSettings);
+  overlay.addEventListener('click', closeSettings);
+
+  themeBtn.addEventListener('click', () => {
+    settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
+    applyTheme();
+    saveSettings();
+  });
+  darkBtn.addEventListener('click', () => { settings.theme = 'dark'; applyTheme(); saveSettings(); });
+  lightBtn.addEventListener('click', () => { settings.theme = 'light'; applyTheme(); saveSettings(); });
+
+  muteBtn.addEventListener('click', () => {
+    settings.soundOn = !settings.soundOn;
+    applySoundSetting();
+    renderSettingsUI();
+    saveSettings();
+  });
+  soundToggle.addEventListener('change', () => {
+    settings.soundOn = soundToggle.checked;
+    applySoundSetting();
+    muteBtn.textContent = settings.soundOn ? '🔊' : '🔇';
+    muteBtn.classList.toggle('muted', !settings.soundOn);
+    saveSettings();
+  });
+
+  researchRange.addEventListener('input', () => {
+    settings.researchMin = parseInt(researchRange.value, 10);
+    researchValue.textContent = settings.researchMin + ' min';
+    saveSettings();
+  });
+  speakingRange.addEventListener('input', () => {
+    settings.speakingMin = parseInt(speakingRange.value, 10);
+    speakingValue.textContent = settings.speakingMin + ' min';
+    saveSettings();
+  });
+  quickPrepRange.addEventListener('input', () => {
+    settings.quickPrepSec = parseInt(quickPrepRange.value, 10);
+    quickPrepValue.textContent = formatSecLabel(settings.quickPrepSec);
+    saveSettings();
+  });
+
+  /* ============================= INIT ============================= */
+  function init() {
+    renderSettingsUI();
+    updatePhaseUI();
+    updateControlsUI();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
