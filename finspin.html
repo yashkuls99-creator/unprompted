@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FinSpin — Indian Finance Topic Randomizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600&display=swap" rel="stylesheet">
 <style>
   :root {
+    --font-serif: 'Fraunces', Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
     --navy: #0b1f3a;
     --navy-deep: #071427;
     --teal: #16b8a6;
@@ -75,9 +79,10 @@
   }
 
   .brand .logo {
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: 0.5px;
+    font-family: var(--font-serif);
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
   }
   .brand .logo span { color: var(--accent-2); }
 
@@ -245,8 +250,20 @@
     box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   }
 
+  .topic-kicker {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    margin-bottom: 10px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .topic-kicker.show { opacity: 1; }
+
   .reel-viewport {
-    min-height: 140px;
+    min-height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -254,14 +271,16 @@
   }
 
   .reel-text {
-    font-size: clamp(1.6rem, 4.2vw, 2.9rem);
-    font-weight: 800;
-    line-height: 1.15;
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 7vw, 5.2rem);
+    font-weight: 700;
+    line-height: 1.05;
     letter-spacing: -0.01em;
     transition: filter 0.08s linear;
   }
 
   .reel-text.placeholder {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: var(--text-faint);
     font-weight: 600;
     font-size: clamp(1.2rem, 3vw, 1.7rem);
@@ -630,6 +649,7 @@
 
 <main>
   <div class="stage-card">
+    <div class="topic-kicker" id="topicKicker">Your Topic</div>
     <div class="reel-viewport">
       <div class="reel-text placeholder" id="reelText">Press Spin to draw a topic</div>
     </div>
@@ -871,6 +891,7 @@
   const spinBtn = $('spinBtn');
   const newTopicBtn = $('newTopicBtn');
   const reelText = $('reelText');
+  const topicKicker = $('topicKicker');
   const metaRow = $('metaRow');
   const timerCard = $('timerCard');
   const phaseLabel = $('phaseLabel');
@@ -1106,6 +1127,7 @@
     presetInput.disabled = true;
     newTopicBtn.classList.add('hidden');
     timerCard.classList.add('hidden');
+    topicKicker.classList.remove('show');
     setPhaseLabelText('Spinning…', '');
 
     const duration = 2800 + Math.random() * 700;
@@ -1139,6 +1161,7 @@
     reelText.style.filter = 'none';
     playLandingChime();
     renderTopicMeta(target);
+    topicKicker.classList.add('show');
     spinBtn.classList.add('hidden');
     newTopicBtn.classList.remove('hidden');
     presetInput.disabled = false;
@@ -1327,6 +1350,7 @@
     reelText.textContent = 'Press Spin to draw a topic';
     reelText.classList.add('placeholder');
     reelText.style.filter = 'none';
+    topicKicker.classList.remove('show');
     metaRow.innerHTML = '';
     spinBtn.classList.remove('hidden');
     spinBtn.disabled = false;
