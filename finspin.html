@@ -74,8 +74,9 @@
 
   .brand {
     display: flex;
-    align-items: baseline;
-    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
   }
 
   .brand .logo {
@@ -83,14 +84,33 @@
     font-size: 1.7rem;
     font-weight: 700;
     letter-spacing: 0.2px;
+    line-height: 1;
   }
   .brand .logo span { color: var(--accent-2); }
 
-  .brand .tagline {
+  .made-by {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.78rem;
     color: var(--text-faint);
     font-weight: 500;
   }
+
+  .handle-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+
+  .ig-icon { color: var(--accent-2); flex-shrink: 0; }
 
   .mode-tabs {
     display: flex;
@@ -619,7 +639,17 @@
 <header>
   <div class="brand">
     <div class="logo">Fin<span>Spin</span></div>
-    <div class="tagline">Indian finance topic randomizer</div>
+    <div class="made-by">
+      <span>made by</span>
+      <span class="handle-pill">
+        <svg class="ig-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+          <circle cx="12" cy="12" r="4"></circle>
+          <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"></circle>
+        </svg>
+        thecharteredchannel
+      </span>
+    </div>
   </div>
 
   <div class="mode-tabs" id="modeTabs">
