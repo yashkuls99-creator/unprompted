@@ -72,21 +72,23 @@
     gap: 12px;
   }
 
-  .brand {
+  .brand-centered {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    margin: 10px auto 4px;
   }
 
-  .brand .logo {
+  .brand-centered .logo {
     font-family: var(--font-serif);
-    font-size: 1.7rem;
+    font-size: clamp(2rem, 4.5vw, 2.6rem);
     font-weight: 700;
     letter-spacing: 0.2px;
     line-height: 1;
   }
-  .brand .logo span { color: var(--accent-2); }
+  .brand-centered .logo span { color: var(--accent-2); }
 
   .made-by {
     display: flex;
@@ -703,21 +705,6 @@
 <body>
 
 <header>
-  <div class="brand">
-    <div class="logo">Fin<span>Spin</span></div>
-    <div class="made-by">
-      <span>made by</span>
-      <span class="handle-pill">
-        <svg class="ig-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="5"></rect>
-          <circle cx="12" cy="12" r="4"></circle>
-          <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"></circle>
-        </svg>
-        thecharteredchannel
-      </span>
-    </div>
-  </div>
-
   <div class="mode-tabs" id="modeTabs">
     <button class="mode-tab active" data-mode="deep" id="tabDeep">Deep Dive</button>
     <button class="mode-tab" data-mode="quick" id="tabQuick">Quick Take</button>
@@ -744,6 +731,21 @@
 </header>
 
 <main>
+  <div class="brand-centered">
+    <div class="logo">Fin<span>Spin</span></div>
+    <div class="made-by">
+      <span>made by</span>
+      <span class="handle-pill">
+        <svg class="ig-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+          <circle cx="12" cy="12" r="4"></circle>
+          <circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"></circle>
+        </svg>
+        thecharteredchannel
+      </span>
+    </div>
+  </div>
+
   <div class="stage-card">
     <div class="topic-kicker" id="topicKicker">Your Topic</div>
     <div class="reel-viewport">
