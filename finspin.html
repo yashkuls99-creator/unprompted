@@ -477,6 +477,7 @@
     color: var(--text);
   }
   .ov-timer-display.zero { color: var(--danger); animation: pulse 1s ease infinite; }
+  .ov-timer-display.mirrored { transform: scaleX(-1); }
 
   .ov-caption {
     font-size: 1rem;
@@ -830,6 +831,14 @@
       <button id="darkBtn" class="active">🌙 Dark</button>
       <button id="lightBtn">☀️ Light</button>
     </div>
+    <div class="toggle-row" style="margin-top:18px;">
+      <span class="slider-label">Mirror timer digits</span>
+      <label class="switch">
+        <input type="checkbox" id="mirrorToggle">
+        <span class="track"><span class="thumb"></span></span>
+      </label>
+    </div>
+    <div style="margin-top:6px; font-size:0.72rem; color:var(--text-faint); line-height:1.4;">For teleprompter / mirror-rig recording, so the countdown reads correctly on camera.</div>
   </div>
 
   <div class="settings-section">
@@ -975,6 +984,7 @@
     quickPrepSec: 30,
     soundOn: true,
     theme: 'dark',
+    mirrorTimer: false,
     categories: [...CATEGORIES],
   };
 
@@ -1035,6 +1045,7 @@
   const quickPrepRange = $('quickPrepRange');
   const quickPrepValue = $('quickPrepValue');
   const soundToggle = $('soundToggle');
+  const mirrorToggle = $('mirrorToggle');
   const darkBtn = $('darkBtn');
   const lightBtn = $('lightBtn');
   const categoryList = $('categoryList');
@@ -1148,8 +1159,14 @@
     soundToggle.checked = settings.soundOn;
     muteBtn.textContent = settings.soundOn ? '🔊' : '🔇';
     muteBtn.classList.toggle('muted', !settings.soundOn);
+    mirrorToggle.checked = settings.mirrorTimer;
+    applyMirrorSetting();
     applyTheme();
     renderCategoryList();
+  }
+
+  function applyMirrorSetting() {
+    ovTimerDisplay.classList.toggle('mirrored', settings.mirrorTimer);
   }
 
   function formatSecLabel(sec) {
@@ -1668,6 +1685,12 @@
     applySoundSetting();
     muteBtn.textContent = settings.soundOn ? '🔊' : '🔇';
     muteBtn.classList.toggle('muted', !settings.soundOn);
+    saveSettings();
+  });
+
+  mirrorToggle.addEventListener('change', () => {
+    settings.mirrorTimer = mirrorToggle.checked;
+    applyMirrorSetting();
     saveSettings();
   });
 
