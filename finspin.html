@@ -834,7 +834,7 @@
     <div class="toggle-row" style="margin-top:18px;">
       <span class="slider-label">Mirror timer digits</span>
       <label class="switch">
-        <input type="checkbox" id="mirrorToggle">
+        <input type="checkbox" id="mirrorToggle" checked>
         <span class="track"><span class="thumb"></span></span>
       </label>
     </div>
@@ -984,7 +984,7 @@
     quickPrepSec: 30,
     soundOn: true,
     theme: 'dark',
-    mirrorTimer: false,
+    mirrorTimer: true,
     categories: [...CATEGORIES],
   };
 
@@ -1130,7 +1130,9 @@
       const raw = localStorage.getItem('finspin.settings');
       if (!raw) return { ...DEFAULT_SETTINGS };
       const parsed = JSON.parse(raw);
-      return { ...DEFAULT_SETTINGS, ...parsed };
+      // mirrorTimer always starts from the built-in default (mirrored on) rather than
+      // a value saved by an older version of this file, so it never silently stays off.
+      return { ...DEFAULT_SETTINGS, ...parsed, mirrorTimer: DEFAULT_SETTINGS.mirrorTimer };
     } catch (e) {
       return { ...DEFAULT_SETTINGS };
     }
